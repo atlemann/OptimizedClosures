@@ -22,3 +22,30 @@ Intel Core i5 CPU 760 2.80GHz (Nehalem), 1 CPU, 4 logical and 4 physical cores
 |       BarInPlaceOptClosure | 200 | 29.689 ms | 0.3378 ms | 0.3160 ms |        - |        - |        - |       24 B |
 | BarInPlaceOptClosureInline | 200 | 29.669 ms | 0.3179 ms | 0.2974 ms |        - |        - |        - |       24 B |
 |               BarFunInside | 200 | 12.629 ms | 0.1294 ms | 0.1147 ms |        - |        - |        - |          - |
+
+
+## C# decompiled
+
+```csharp
+public static a[] bar<a>(FSharpFunc<a, FSharpFunc<a, a>> f, a[] a, a[] b)
+{
+    return ArrayModule.Map2(f, a, b);
+}
+
+public static void barInPlace<a>(FSharpFunc<a, FSharpFunc<a, a>> f, a[] a, a[] b)
+{
+    for (int i = 0; i < b.Length; i++)
+    {
+        b[i] = FSharpFunc<a, a>.InvokeFast(f, a[i], b[i]);
+    }
+}
+
+public static void barInPlaceOptClosure<a>(FSharpFunc<a, FSharpFunc<a, a>> f, a[] a, a[] b)
+{
+    OptimizedClosures.FSharpFunc<a, a, a> fSharpFunc = OptimizedClosures.FSharpFunc<a, a, a>.Adapt(f);
+    for (int i = 0; i < b.Length; i++)
+    {
+        b[i] = fSharpFunc.Invoke(a[i], b[i]);
+    }
+}
+```
